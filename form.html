@@ -1,0 +1,300 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col-md-10">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'vehicles/form/info'
+                                ],
+                                'details'   :
+                                [
+                                    'tabTitle'          : 'Details',
+                                    'tabInclude'        : 'vehicles/form/details'
+                                ],
+                                'services'   :
+                                [
+                                    'tabTitle'          : 'Services',
+                                    'tabContent'        : 'Services'
+                                ],
+                                'insurances'   :
+                                [
+                                    'tabTitle'          : 'Insurances',
+                                    'tabContent'        : 'Insurances'
+                                ],
+                                'documents'   :
+                                [
+                                    'tabTitle'          : 'Documents',
+                                    'tabInclude'        : 'vehicles/form/documents'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+{% set uoms = escaper.js(json_encode(uoms, 16)) %}
+{% set vehicleDetails = escaper.js(json_encode(vehicle, 16)) %}
+<script>
+/*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore dataCollection Swal */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+if (!dataCollectionSectionForm['vars']) {
+    dataCollectionSectionForm['vars'] = { };
+}
+if (!dataCollectionSectionForm['funcs']) {
+    dataCollectionSectionForm['funcs'] = { };
+}
+
+dataCollectionSectionForm['vars']['uoms'] = JSON.parse('{{uoms}}');
+dataCollectionSectionForm['vars']['vehicle'] = JSON.parse('{{vehicleDetails}}');
+
+dataCollectionSectionForm['funcs']['resetDownloadButtons'] = function() {
+    $('.removeDocument').off();
+    $('.removeDocument').click(function(e) {
+        e.preventDefault();
+
+        var thisTr = $(this).parents('tr');
+        var color = 'warning';
+        var text = '<span class="text-warning">Remove document from Vehicle?<span>';
+
+        Swal.fire({
+            html                        : text,
+            icon                        : 'question',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Remove',
+            customClass                 : {
+                'confirmButton'             : 'btn btn-' + color + ' text-uppercase',
+                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : true,
+            allowEscapeKey              : true,
+            didOpen                     : function() {
+                window['dataCollection'].env.sounds.swalSound.play();
+            }
+        }).then((result) => {
+            if (result.value) {
+                delete(dataCollectionSectionForm['vars']['vehicle']['documents'][thisTr[0].id]);
+
+                dataCollectionSectionForm['funcs']['updateDocuments']();
+            }
+        });
+    });
+}
+
+dataCollectionSectionForm['funcs']['updateDocuments'] = function(removesigned = false) {
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+    postData['documents'] = dataCollectionSectionForm['vars']['vehicle']['documents'];
+    if (removesigned) {
+        postData['removesigned'] = true;
+    }
+
+    $.post('{{links.url("vehicles/updateDocument")}}', postData, function(response) {
+        if (response.responseCode == 0) {
+            paginatedPNotify('success', response.responseMessage);
+
+            if (response.responseData.documents) {
+                dataCollectionSectionForm['vars']['vehicle']['documents'] = response.responseData.documents;
+
+                dataCollectionSectionForm['vars']['documentsTable'].rows().remove().draw();
+
+                if (Object.keys(dataCollectionSectionForm['vars']['vehicle']['documents']).length > 0) {
+                    for (var row in dataCollectionSectionForm['vars']['vehicle']['documents']) {
+                        var docRow = { };
+
+                        docRow['org_file_name'] = dataCollectionSectionForm['vars']['vehicle']['documents'][row]['org_file_name'];
+                        docRow['account_name'] = dataCollectionSectionForm['vars']['vehicle']['documents'][row]['account_name'];
+                        docRow['date'] = dataCollectionSectionForm['vars']['vehicle']['documents'][row]['date'];
+
+                        docRow['actions'] =
+                            '<a target="_blank" class="btn btn-xs btn-primary mr-1 downloadDocument text-white" href="#"' +
+                            'id="{{componentId}}-{{sectionId}}-download-' + dataCollectionSectionForm['vars']['vehicle']['documents'][row]['uuid'] +
+                            '" data-id="' + dataCollectionSectionForm['vars']['vehicle']['documents'][row]['uuid'] +
+                            '" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"' +
+                            ' data-original-title=""><i class="fas fa-fw fa-download"></i> </a>' +
+                            '<button class="btn btn-xs btn-danger mr-1 removeDocument text-white" ' +
+                            'id="{{componentId}}-{{sectionId}}-remove-' + dataCollectionSectionForm['vars']['vehicle']['documents'][row]['uuid'] +
+                            '" data-id="' + dataCollectionSectionForm['vars']['vehicle']['documents'][row]['uuid'] +
+                            '" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"' +
+                            ' data-original-title=""><i class="fas fa-fw fa-trash"></i> </button>';
+                        docRow['DT_RowId'] = dataCollectionSectionForm['vars']['vehicle']['documents'][row]['uuid'];
+
+                        dataCollectionSectionForm['vars']['documentsTable'].row.add(docRow).draw();
+
+                        var url = '{{links.url("system/storages/q/uuid/' + dataCollectionSectionForm['vars']['vehicle']['documents'][row]['uuid'] + '")}}';
+                        $('#{{componentId}}-{{sectionId}}-download-' + dataCollectionSectionForm['vars']['vehicle']['documents'][row]['uuid']).attr('href', url);
+                    }
+
+                    dataCollectionSectionForm['funcs']['resetDownloadButtons']();
+                }
+            }
+        } else {
+            paginatedPNotify('error', response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-archived'                        : { },
+        '{{componentId}}-{{sectionId}}-registration_no'                 : { },
+        '{{componentId}}-{{sectionId}}-organisation_id'                 : {
+            placeholder: "SELECT ORGANISATION"
+        },
+        '{{componentId}}-{{sectionId}}-company_id'                      : {
+            placeholder: "SELECT VENDOR"
+        },
+        '{{componentId}}-{{sectionId}}-make'                            : { },
+        '{{componentId}}-{{sectionId}}-model'                           : { },
+        '{{componentId}}-{{sectionId}}-vehicle_type'                    : { },
+        '{{componentId}}-{{sectionId}}-manufacturing_year'              : { },
+        '{{componentId}}-{{sectionId}}-euro_norms'                      : { },
+        '{{componentId}}-{{sectionId}}-no_of_wheels'                    : { },
+        '{{componentId}}-{{sectionId}}-capacity'                        : { },
+        '{{componentId}}-{{sectionId}}-capacity_uom'                    : {
+            placeholder: "SELECT CAPACITY UNIT OF MEASUREMENT"
+        },
+        '{{componentId}}-{{sectionId}}-purchase_date'                   : {
+            altFormat           : "d-m-Y",
+            allowInput          : true,
+            static              : true
+        },
+        '{{componentId}}-{{sectionId}}-purchase_odo'                    : { },
+        '{{componentId}}-{{sectionId}}-fuel_capacity'                   : { },
+        '{{componentId}}-{{sectionId}}-fuel_consumption'                : { },
+        '{{componentId}}-{{sectionId}}-status'                          : { },
+        '{{componentId}}-{{sectionId}}-documents'                       : {
+            afterInit: function() {
+                if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-documents-table')) {
+                    var columns =
+                        [
+                            {data: 'org_file_name', orderable: true},
+                            {data: 'account_name', orderable: true},
+                            {data: 'date', orderable: true},
+                            {data: 'actions', orderable: false}
+                        ];
+
+                    dataCollectionSectionForm['vars']['documentsTable'] = $('#{{componentId}}-{{sectionId}}-documents-table').DataTable({
+                        columns: columns
+                    });
+                }
+
+                dataCollectionSectionForm['funcs']['resetDownloadButtons']();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form' : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-registration_no'         : 'required',
+                '{{componentId}}-{{sectionId}}-organisation_id'         : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-registration_no'         : 'Please enter first name',
+                '{{componentId}}-{{sectionId}}-organisation_id'         : 'Please select organisation'
+            },
+            onSubmit: function() {
+                return true;
+            }
+        }
+    });
+
+$('#body').off('dropzoneInitDone');
+$('#body').on('dropzoneInitDone', function() {
+    if (window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-upload_documents']) {
+        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-upload_documents']['onSuccess'] = function(file, response) {
+            if (!dataCollectionSectionForm['vars']['vehicle']['documents']) {
+                dataCollectionSectionForm['vars']['vehicle']['documents'] = { };
+            }
+            if (response.responseData && response.responseData.uuid) {
+                dataCollectionSectionForm['vars']['vehicle']['documents'][response.responseData.uuid] = { }
+                dataCollectionSectionForm['vars']['vehicle']['documents'][response.responseData.uuid]['uuid'] = response.responseData['uuid'];
+                dataCollectionSectionForm['vars']['vehicle']['documents'][response.responseData.uuid]['org_file_name'] = response.responseData['org_file_name'];
+            }
+        };
+        window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-upload_documents']['onQueueComplete'] = function() {
+            dataCollectionSectionForm['funcs']['updateDocuments']();
+        };
+    }
+});
+</script>

@@ -1,0 +1,128 @@
+{% set vehicleDocuments = [] %}
+{% if vehicle['documents'] is defined %}
+    {% set vehicleDocuments = vehicle['documents'] %}
+{% endif %}
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'upload_documents',
+                'fieldType'                     : 'files/dropzone',
+                'fieldLabel'                    : false,
+                'fieldDropzoneLabel'            : 'Upload Documents',
+                'fieldRequired'                 : false,
+                'fieldHelp'                     : true,
+                'fieldHelpTooltipContent'       : 'Max: 10. Upload documents like receipts, invoices, LR pics, etc. You can zip an upload more files.',
+                'fieldAdditionalClass'          : 'mb-1',
+                'fieldBazScan'                  : true,
+                'fieldBazPostOnCreate'          : false,
+                'fieldBazPostOnUpdate'          : false,
+                'attachments'                   : [],
+                'maxAttachments'                : 10,
+                'storage'                       : storage,
+                'noPreview'                     : true,
+                'setOrphan'                     : false,
+                'upload'                        : true
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+{% set tableData = '' %}
+{% if vehicleDocuments|length > 0 %}
+    {% for document in vehicleDocuments %}
+        {% set tableData = tableData ~ '<tr id="' ~ document['uuid'] ~ '">' %}
+            {% if document['org_file_name'] %}
+                {% set tableData = tableData ~ '<td>' ~ document['org_file_name'] ~ '</td>' %}
+            {% else %}
+                {% set tableData = tableData ~ '<td>-</td>' %}
+            {% endif %}
+            {% if document['account_name'] is defined %}
+                {% set tableData = tableData ~ '<td>' ~ document['account_name'] ~ '</td>' %}
+            {% else %}
+                {% set tableData = tableData ~ '<td>-</td>' %}
+            {% endif %}
+            {% if document['date'] is defined %}
+                {% set tableData = tableData ~ '<td>' ~ document['date'] ~ '</td>' %}
+            {% else %}
+                {% set tableData = tableData ~ '<td>-</td>' %}
+            {% endif %}
+            {% set documentsButtons = [] %}
+            {% set documentsButtons['download-' ~ document['uuid']] = [
+                    'title'                   : false,
+                    'icon'                    : 'download',
+                    'size'                    : 'xs',
+                    'buttonAdditionalClass'   : 'downloadDocument text-white',
+                    'url'                     : links.url('system/storages/q/uuid/' ~ document['uuid']),
+                    'data'                    : [
+                        'uuid'                  : document['uuid']
+                    ]
+                ]
+            %}
+            {% set documentsButtons['remove-' ~ document['uuid']] = [
+                    'title'                   : false,
+                    'icon'                    : 'trash',
+                    'size'                    : 'xs',
+                    'buttonAdditionalClass'   : 'removeDocument text-white',
+                    'type'                    : 'danger',
+                    'data'                    : [
+                        'uuid'                  : document['uuid']
+                    ]
+                ]
+            %}
+            {% set tableData = tableData ~
+                '<td>' ~ adminltetags.useTag('buttons',
+                            [
+                                'component'                     : component,
+                                'componentName'                 : componentName,
+                                'componentId'                   : componentId,
+                                'parentComponentId'             : parent,
+                                'sectionId'                     : sectionId,
+                                'buttonType'                    : 'button',
+                                'buttons'                       : documentsButtons
+                            ]
+                        ) ~ '</td>'
+            %}
+            {% set tableData = tableData ~ '</tr>' %}
+    {% endfor %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'documents',
+                'fieldLabel'                     : 'Vehicle Documents',
+                'fieldType'                      : 'html',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'List of documents uploaded to this vehicle.',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnUpdate'           : false
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <table id="{{componentId}}-{{sectionId}}-documents-table" class="table table-sm table-hover responsive nowrap mb-0" width="100%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th class="text-uppercase">Name</th>
+                    <th class="text-uppercase">Uploaded By</th>
+                    <th class="text-uppercase">Uploaded On</th>
+                    <th class="text-uppercase">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>{{tableData}}</tbody>
+        </table>
+    </div>
+</div>

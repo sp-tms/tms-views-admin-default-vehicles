@@ -1,0 +1,234 @@
+<!-- htmlhint tag-pair:false -->
+{% if vehicle['id'] is defined %}
+    {% set vehicleId = vehicle['id'] %}
+    {% set vehicleArchived = vehicle['archived'] %}
+    {% set vehicleStatus = vehicle['status'] %}
+    {% set vehicleRegistrationNo = vehicle['registration_no'] %}
+    {% set vehicleOrganisation = vehicle['organisation_id'] %}
+    {% set vehicleVendor = vehicle['company_id'] %}
+    {% set vehicleMake = vehicle['make'] %}
+    {% set vehicleModel = vehicle['model'] %}
+    {% set vehicleType = vehicle['vehicle_type'] %}
+    {% set vehicleManufacturingYear = vehicle['manufacturing_year'] %}
+    {% set vehicleEuroNorms = vehicle['euro_norms'] %}
+    {% set vehicleNoOfWheels = vehicle['no_of_wheels'] %}
+    {% set vehicleCapacity = vehicle['capacity'] %}
+    {% set vehicleCapacityUom = vehicle['capacity_uom'] %}
+    {% set vehiclePurchaseDate = vehicle['purchase_date'] %}
+    {% set vehiclePurchaseOdo = vehicle['purchase_odo'] %}
+    {% set vehicleFuelCapacity = vehicle['fuel_capacity'] %}
+    {% set vehicleFuelConsumption = vehicle['fuel_consumption'] %}
+    {% set vehicleServiceOdo = vehicle['service_odo'] %}
+    {% set vehicleServiceMonths = vehicle['service_months'] %}
+    {% set vehicleDocuments = vehicle['documents'] %}
+{% else %}
+    {% set vehicleId = '' %}
+    {% set vehicleArchived = '' %}
+    {% set vehicleStatus = '' %}
+    {% set vehicleRegistrationNo = '' %}
+    {% set vehicleOrganisation = '' %}
+    {% set vehicleVendor = '' %}
+    {% set vehicleMake = '' %}
+    {% set vehicleModel = '' %}
+    {% set vehicleType = '' %}
+    {% set vehicleManufacturingYear = '' %}
+    {% set vehicleEuroNorms = '' %}
+    {% set vehicleNoOfWheels = '' %}
+    {% set vehicleCapacity = '' %}
+    {% set vehicleCapacityUom = '' %}
+    {% set vehiclePurchaseDate = '' %}
+    {% set vehiclePurchaseOdo = '' %}
+    {% set vehicleFuelCapacity = '' %}
+    {% set vehicleFuelConsumption = '' %}
+    {% set vehicleServiceOdo = '' %}
+    {% set vehicleServiceMonths = '' %}
+    {% set vehicleDocuments = '' %}
+{% endif %}
+{% if vehicleArchived == '1' %}
+    {% set vehicleArchivedChecked = true %}
+{% else %}
+    {% set vehicleArchivedChecked = false %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'id',
+                'fieldLabel'                     : 'ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : vehicleId
+            ]
+        )}}
+    </div>
+</div>
+<div class="row vdivide">
+    <div class="col-md-3 col-sm-12">
+        {% set vehicleImage = '' %}
+        {% if vehicle['image'] is defined and vehicle['image'] !== '' %}
+            {% set imageLink = links.url('system/storages/q/uuid/' ~ vehicle['image'] ~ '/w/200') %}
+        {% else %}
+            {% set imageLink = '' %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'image',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'files/croppie',
+                'fieldValue'                     : vehicleImage,
+                'imageType'                      : 'image',
+                'storageType'                    : 'private',
+                'upload'                         : true,
+                'avatar'                         : true,
+                'remove'                         : true,
+                'recover'                        : true,
+                'imageLink'                      : imageLink
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'registration_no',
+                        'fieldLabel'                     : 'Registration #',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Registration #',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : vehicleRegistrationNo
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'status',
+                        'fieldLabel'                            : 'Status',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Select status",
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : vehicleStatuses,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : vehicleStatus
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'archived',
+                        'fieldLabel'                     : 'Archived?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Check to archive company.',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'danger',
+                        'fieldCheckboxChecked'           : vehicleArchivedChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldDisabled'                  : false,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'organisation_id',
+                        'fieldLabel'                            : 'Organisation',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Select organisation",
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : organisations,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : vehicleOrganisation
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'company_id',
+                        'fieldLabel'                            : 'Vendor',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Select Vendor",
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : vendors,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : vehicleVendor
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<!-- htmlmin:ignore -->

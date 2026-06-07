@@ -1,1 +1,34 @@
-Vehicle View
+{% if vehicle['id'] is defined %}
+    {% set vehicleId = vehicle['id'] %}
+    {% set title = 'Vehicle (' ~ vehicle['registration_no'] ~ ')' %}
+{% else %}
+    {% set vehicleId = '' %}
+    {% set title = 'New Vehicle' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'truck-moving',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'vehicles/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : vehicleId,
+            'addActionUrl'                  : 'vehicles/add',
+            'addSuccessRedirectUrl'         : 'vehicles',
+            'updateActionUrl'               : 'vehicles/update',
+            'updateSuccessRedirectUrl'      : 'vehicles',
+            'cancelActionUrl'               : 'vehicles',
+            'closeActionUrl'                : 'vehicles'
+        ]
+    ]
+)}}
