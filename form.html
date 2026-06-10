@@ -267,11 +267,15 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form' : {
             rules: {
                 '{{componentId}}-{{sectionId}}-registration_no'         : 'required',
-                '{{componentId}}-{{sectionId}}-organisation_id'         : 'required'
+                '{{componentId}}-{{sectionId}}-status'                  : 'required',
+                '{{componentId}}-{{sectionId}}-organisation_id'         : 'required',
+                '{{componentId}}-{{sectionId}}-company_id'              : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-registration_no'         : 'Please enter first name',
-                '{{componentId}}-{{sectionId}}-organisation_id'         : 'Please select organisation'
+                '{{componentId}}-{{sectionId}}-status'                  : 'Please select status',
+                '{{componentId}}-{{sectionId}}-organisation_id'         : 'Please select organisation',
+                '{{componentId}}-{{sectionId}}-company_id'              : 'Please select vendor'
             },
             onSubmit: function() {
                 return true;
