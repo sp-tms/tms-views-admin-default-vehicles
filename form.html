@@ -82,7 +82,10 @@
     </div>
 </div>
 {% set uoms = escaper.js(json_encode(uoms, 16)) %}
-{% set vehicleDetails = escaper.js(json_encode(vehicle, 16)) %}
+{% set vehicleDetails = escaper.js(json_encode([], 16)) %}
+{% if vehicle['id'] is defined %}
+    {% set vehicleDetails = escaper.js(json_encode(vehicle, 16)) %}
+{% endif %}
 <script>
 /*global paginatedPNotify BazProgress BazContentFields BazHelpers BazContentLoader Pace BazCore dataCollection Swal */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -220,6 +223,9 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                              : { },
         '{{componentId}}-{{sectionId}}-archived'                        : { },
         '{{componentId}}-{{sectionId}}-registration_no'                 : { },
+        '{{componentId}}-{{sectionId}}-status'                          : {
+            placeholder: "SELECT STATUS"
+        },
         '{{componentId}}-{{sectionId}}-organisation_id'                 : {
             placeholder: "SELECT ORGANISATION"
         },
@@ -244,7 +250,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-purchase_odo'                    : { },
         '{{componentId}}-{{sectionId}}-fuel_capacity'                   : { },
         '{{componentId}}-{{sectionId}}-fuel_consumption'                : { },
-        '{{componentId}}-{{sectionId}}-status'                          : { },
         '{{componentId}}-{{sectionId}}-documents'                       : {
             afterInit: function() {
                 if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-documents-table')) {
