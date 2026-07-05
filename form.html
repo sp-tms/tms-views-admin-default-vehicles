@@ -39,26 +39,23 @@
     <div class="col-md-10">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-                {{adminltetags.useTag('tabs',
+                {% set tabs =
                     [
-                        'component'                     : component,
-                        'componentName'                 : componentName,
-                        'componentId'                   : componentId,
-                        'sectionId'                     : 'main',
-                        'tabsId'                        : 'tabs',
-                        'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      :
+                        'info'   :
+                        [
+                            'tabTitle'          : 'Info',
+                            'tabInclude'        : 'vehicles/form/info'
+                        ],
+                        'details'   :
+                        [
+                            'tabTitle'          : 'Details',
+                            'tabInclude'        : 'vehicles/form/details'
+                        ]
+                    ]
+                %}
+                {% if vehicle['id'] is defined %}
+                    {% set tabs = array_merge(tabs,
                             [
-                                'info'   :
-                                [
-                                    'tabTitle'          : 'Info',
-                                    'tabInclude'        : 'vehicles/form/info'
-                                ],
-                                'details'   :
-                                [
-                                    'tabTitle'          : 'Details',
-                                    'tabInclude'        : 'vehicles/form/details'
-                                ],
                                 'services'   :
                                 [
                                     'tabTitle'          : 'Services',
@@ -75,6 +72,18 @@
                                     'tabInclude'        : 'vehicles/form/documents'
                                 ]
                             ]
+                        )
+                    %}
+                {% endif %}
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      : tabs
                     ]
                 )}}
             </fieldset>

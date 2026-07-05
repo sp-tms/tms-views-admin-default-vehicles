@@ -30,6 +30,19 @@
             'updateSuccessRedirectUrl'      : 'vehicles',
             'cancelActionUrl'               : 'vehicles',
             'closeActionUrl'                : 'vehicles'
+        ],
+        'dataDependencies'              :
+        [
+            [
+                'componentName'      : 'Companies (Organisation)',
+                'componentVar'       : organisations,
+                'componentRoute'     : 'companies/q/id/0/businesstype/organisations'
+            ],
+            [
+                'componentName'      : 'Companies (Vendors)',
+                'componentVar'       : vendors,
+                'componentRoute'     : 'companies/q/id/0/businesstype/vendors'
+            ]
         ]
     ]
 )}}

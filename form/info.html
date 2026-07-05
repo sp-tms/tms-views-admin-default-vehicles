@@ -1,6 +1,7 @@
 <!-- htmlhint tag-pair:false -->
 {% if vehicle['id'] is defined %}
     {% set vehicleId = vehicle['id'] %}
+    {% set vehicleImage = vehicle['image'] %}
     {% set vehicleArchived = vehicle['archived'] %}
     {% set vehicleStatus = vehicle['status'] %}
     {% set vehicleRegistrationNo = vehicle['registration_no'] %}
@@ -23,6 +24,7 @@
     {% set vehicleDocuments = vehicle['documents'] %}
 {% else %}
     {% set vehicleId = '' %}
+    {% set vehicleImage = '' %}
     {% set vehicleArchived = '' %}
     {% set vehicleStatus = '' %}
     {% set vehicleRegistrationNo = '' %}
@@ -75,7 +77,6 @@
 </div>
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
-        {% set vehicleImage = '' %}
         {% if vehicle['image'] is defined and vehicle['image'] !== '' %}
             {% set imageLink = links.url('system/storages/q/uuid/' ~ vehicle['image'] ~ '/w/200') %}
         {% else %}
@@ -94,9 +95,9 @@
                 'imageType'                      : 'image',
                 'storageType'                    : 'private',
                 'upload'                         : true,
-                'avatar'                         : true,
+                'avatar'                         : false,
                 'remove'                         : true,
-                'recover'                        : true,
+                'recover'                        : false,
                 'imageLink'                      : imageLink,
                 'filePackageClass'               : 'Apps_Tms_Packages_Vehicles_Vehicles',
                 'filePackageRowId'               : vehicleId
